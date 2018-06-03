@@ -1,0 +1,1 @@
+train and test can be taken for example from here https://www.kaggle.com/c/sberbank-russian-housing-market/submissions?sortBy=date&group=all&page=1
