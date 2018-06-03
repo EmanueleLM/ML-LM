@@ -1,0 +1,96 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Jun  1 21:03:04 2018
+
+@author: Emanuele
+
+PCA algorithm for both numpy and pandas datatypes.
+
+ If the pandas version is employed, it works with both numerical and categorical
+  features. In the latter case, the concept of "unalikability" is employed as measure
+  of the variance of the data with itself, with the covariance calculated using 
+  the mean, when a variable (or both) is categorical.
+"""
+
+import numpy as np
+import pandas as pd
+
+# PCA with input matrix (i.e. non-labeled data).
+#
+# Returns the dimensions that caputure the most variance in the data.
+#
+# Two methods can be used: 'k-most', which returns the k (out of d, where d is the
+#  number of dimensions of the data) dimensions with the highest variance, or 
+#  'percentage', that takes all the dimensions that contributes to the total variance
+#  up to a predefined value k, which is expressed as a float between 0 and 1.
+def pca(data, method="k-most", k=1):
+    
+    # covariance, eigenvectors, eigenvalues
+    cov_matrix = np.cov(data);
+    eig_val, eig_vec = np.linalg.eig(cov_matrix);
+    
+    eig_val = np.abs(eig_val);
+    
+    if (method == "k-most"):
+        
+        # create a list of (eigenvector, eigenvalue, index) tuples
+        eig_list = [(eig_vec[i], eig_val[i], i) for i in range(len(eig_val))];
+               
+        # order by descending explained variance
+        eig_list.sort(key=lambda x: x[1], reverse=True);
+                       
+        # take the first k dimensions
+        out = list(i[0] for i in eig_list[:k]);
+                 
+    elif (method == "percentage"):
+        
+        # create a list of (eigenvector, eigenvalue, index) tuples
+        eig_list = [(eig_vec[i], eig_val[i], i) for i in range(len(eig_val))];
+               
+        # order by descending explained variance
+        eig_list.sort(key=lambda x: x[1], reverse=True);
+        
+        # take the first d dimensions s.t. their explained variance is at least
+        #  a fraction k of the total variance
+        out = list();
+        var_total = np.sum(eig_val)*k;
+        var_partial = .0;
+               
+        for i in range(len(eig_list)):
+            
+            if var_partial > var_total:
+                break;
+                
+            out.append(eig_list[i][0]);
+            var_partial += eig_list[i][1];
+        
+    else:
+        
+        print("Warning: undefined method ", method, " for PCA analysis.");
+        return data;
+    
+    return out;
+    
+    
+
+# PCA with categorical data and Pandas DataFrame as input.
+#
+# The method is very the same as the previous one (pca), except that this one
+#  handles categorical attributes and transforms each entry into the the frequency
+#  of the class, then calculates the 'unalikability' for each class and uses it 
+#  as a measure of categorical variance. Please refer to the README in the official
+#  repo for more info about 'unalikability' (and the ref. to the original paper).
+#
+# Please note that you must specify which columns are categorical: columns are
+#  a list of integers, each of those represents the i-th column in the DataFrame
+def pca_labeled(data, columns=[], method="k-most", k=1):   
+    
+    # tranform non-numerical instances to calculate 'unalikability'
+    for j in columns:
+        
+        data.iloc[:,j] = data.map(data.iloc[:,j].value_counts(normalize=True));
+    
+    # call pca now that all the data is numerical
+    out = pca(data.values.astype(float), method=method, k=k);
+    
+    return out;
