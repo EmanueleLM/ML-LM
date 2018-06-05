@@ -17,31 +17,38 @@ import pandas as pd
 
 # PCA with input matrix (i.e. non-labeled data).
 #
-# Returns the dimensions that caputure the most variance in the data.
+# Returns the dimensions that caputure the most variance in the data and the indices
+#  of the columns that are returned
 #
 # Two methods can be used: 'k-most', which returns the k (out of d, where d is the
 #  number of dimensions of the data) dimensions with the highest variance, or 
 #  'percentage', that takes all the dimensions that contributes to the total variance
 #  up to a predefined value k, which is expressed as a float between 0 and 1.
 def pca(data, method="k-most", k=1):
-    
+       
     # covariance, eigenvectors, eigenvalues
-    cov_matrix = np.cov(data);
+    cov_matrix = np.cov(data); 
     eig_val, eig_vec = np.linalg.eig(cov_matrix);
     
     eig_val = np.abs(eig_val);
+    
+    # list of indices of the k most important features
+    eig_indices = list();
     
     if (method == "k-most"):
         
         # create a list of (eigenvector, eigenvalue, index) tuples
         eig_list = [(eig_vec[i], eig_val[i], i) for i in range(len(eig_val))];
-               
-        # order by descending explained variance
+         
+        # order by explained variance (descending)
         eig_list.sort(key=lambda x: x[1], reverse=True);
-                       
+        
         # take the first k dimensions
         out = list(i[0] for i in eig_list[:k]);
-                 
+        
+        # append the index of the i-th most important feature
+        eig_indices = list(i[-1] for i in eig_list[:k]);         
+        
     elif (method == "percentage"):
         
         # create a list of (eigenvector, eigenvalue, index) tuples
@@ -63,13 +70,19 @@ def pca(data, method="k-most", k=1):
                 
             out.append(eig_list[i][0]);
             var_partial += eig_list[i][1];
+            
+            # append the index of the i-th most important feature
+            eig_indices.append(i);
         
     else:
         
         print("Warning: undefined method ", method, " for PCA analysis.");
-        return data;
+        return data, eig_indices;
     
-    return out;
+    # convert back to numpy matrix
+    out = np.array(out).T;
+      
+    return out, eig_indices;
     
     
 
@@ -83,14 +96,31 @@ def pca(data, method="k-most", k=1):
 #
 # Please note that you must specify which columns are categorical: columns are
 #  a list of integers, each of those represents the i-th column in the DataFrame
-def pca_labeled(data, columns=[], method="k-most", k=1):   
+def pca_labeled(data, columns=[], method="k-most", k=1, get_pandas=False):   
     
-    # tranform non-numerical instances to calculate 'unalikability'
-    for j in columns:
+    cols = data.columns;
+    
+    # case columns is not defined: take all 'objects' types as categorical
+    if columns != []:
         
-        data.iloc[:,j] = data.map(data.iloc[:,j].value_counts(normalize=True));
+        # tranform non-numerical instances to calculate 'unalikability'
+        for j in columns:
+            
+            data.iloc[:,j] = data.map(data.iloc[:,j].value_counts(normalize=True));
     
+    else:
+        
+        for j in data.columns:
+                      
+            if data[j].dtypes == np.object:
+                
+                data[j] = data[j].map(data[j].value_counts(normalize=True));
+                
     # call pca now that all the data is numerical
-    out = pca(data.values.astype(float), method=method, k=k);
+    out, k_dims = pca(data.values.astype(float), method=method, k=k);
+    
+    if get_pandas is True:
+        
+        out = pd.DataFrame(out, columns=cols[k_dims]);
     
     return out;
