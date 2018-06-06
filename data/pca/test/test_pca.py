@@ -33,6 +33,12 @@ if __name__ == "__main__":
     x_num = np.random.rand(10, 15);
     
     # concatenate numbers and objects
-    x = np.append(x_objects, x_num);
+    x = np.concatenate((x_objects, x_num), axis=1);
     
-    # ...
+    # create pandas DataFrame
+    df = pd.DataFrame(x, columns=[str(a) for a in range(30)], dtype=object);
+    df.iloc[:, 15:] = df.iloc[:, 15:].astype(float); # convert to float the numbers
+    
+    # launch pca_labeled
+    res = pca_labeled(df, k=5, get_pandas=True);
+    
