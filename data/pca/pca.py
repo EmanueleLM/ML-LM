@@ -20,14 +20,16 @@ import pandas as pd
 # Returns the dimensions that caputure the most variance in the data and the indices
 #  of the columns that are returned
 #
-# Two methods can be used: 'k-most', which returns the k (out of d, where d is the
+# Two methods can be used: 'best', which returns the k (out of d, where d is the
 #  number of dimensions of the data) dimensions with the highest variance, or 
-#  'percentage', that takes all the dimensions that contributes to the total variance
+#  'cumulative', that takes all the dimensions that contributes to the total variance
 #  up to a predefined value k, which is expressed as a float between 0 and 1.
-def pca(data, method="k-most", k=1):
+#
+# please note that the data must be in the format (samples, columns)
+def pca(data, method="best", k=1):
        
     # covariance, eigenvectors, eigenvalues
-    cov_matrix = np.cov(data); 
+    cov_matrix = np.cov(data.T);  # covariance matrix needs to transpose input
     eig_val, eig_vec = np.linalg.eig(cov_matrix);
     
     eig_val = np.abs(eig_val);
@@ -35,7 +37,7 @@ def pca(data, method="k-most", k=1):
     # list of indices of the k most important features
     eig_indices = list();
     
-    if (method == "k-most"):
+    if (method == "best"):
         
         # create a list of (eigenvector, eigenvalue, index) tuples
         eig_list = [(eig_vec[i], eig_val[i], i) for i in range(len(eig_val))];
@@ -49,7 +51,7 @@ def pca(data, method="k-most", k=1):
         # append the index of the i-th most important feature
         eig_indices = list(i[-1] for i in eig_list[:k]);         
         
-    elif (method == "percentage"):
+    elif (method == "cumulative"):
         
         # create a list of (eigenvector, eigenvalue, index) tuples
         eig_list = [(eig_vec[i], eig_val[i], i) for i in range(len(eig_val))];
@@ -96,7 +98,8 @@ def pca(data, method="k-most", k=1):
 #
 # Please note that you must specify which columns are categorical: columns are
 #  a list of integers, each of those represents the i-th column in the DataFrame
-def pca_labeled(data, columns=[], method="k-most", k=1, get_pandas=False):   
+# if get_pamdas is set to True, a DataFrame object is returned
+def pca_labeled(data, columns=[], method="best", k=1, get_pandas=False):   
     
     cols = data.columns;
     
