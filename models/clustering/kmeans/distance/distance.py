@@ -8,19 +8,35 @@ Implementation of distances: returns a vector of distances between a single poin
  (e.g. the cluster) and other points (that can be whole the dataset).
 """
 
+import numpy as np
+
 # L2 or Euclidean norm between two points
 def L2(pt, pts):
     
-    pass;
+    res = np.power((pts-pt),2); # SIMD operations
+    res = np.sqrt(np.sum(res, axis=1));
     
+    return res;
+
+# L1 norm    
 def L1(pt, pts):
     
-    pass;
-      
-def LMin(pt, pts):
+    res = np.sum(np.abs(pts-pt), axis=1); # SIMD operations
     
-    pass;
+    return res;
+  
+# L0 which takes the minimum element from each pt to pts distance
+def L0(pt, pts):
     
-def LMax(pt, pts):
+    res = np.abs(pts-pt); # SIMD operations
+    res = np.min(res, axis=1);
     
-    pass;
+    return res;
+ 
+# LInf which takes the maximum element from each pt to pts distance
+def LInf(pt, pts):
+    
+    res = np.abs(pts-pt); # SIMD operations
+    res = np.max(res, axis=1);
+    
+    return res;
