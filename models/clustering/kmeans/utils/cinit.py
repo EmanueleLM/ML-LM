@@ -22,34 +22,34 @@ import numpy as np
 
 # random initialization procedure.
 # returns the centers as datapoints.
-def random(data, k):
+def random(data, k, distance=None):
     
-    clusters = np.random.choice(range(data.shape[0]), size=k, replace=False);
+    centers = np.random.choice(range(data.shape[0]), size=k, replace=False);
     
-    return data[clusters];
+    return data[centers];
 
 # TODO: once a point becomes a cluster, it cannot be selected again
 # kmeans++ initialization procedure.
 def kmeans_plus_plus(data, k, distance):
     
     # select the firt point at random from data
-    clusters = list();
+    centers = list();
     center = np.random.choice(range(data.shape[0]), size=1);
-    clusters.append(data[center]);
+    centers.append(data[center]);
     np.delete(data, center);
     
     for _ in range(k-1):
         
         # create pdf for each datapoint wrt the last element of the cluster
-        p_cluster = distances_dict[distance](clusters[-1], data);
+        p_cluster = distances_dict[distance](centers[-1], data);
         p_cluster = p_cluster/np.sum(p_cluster, axis=0);
         
         # select new point of the cluster by picking from the pdf
         center = np.random.choice(range(data.shape[0]), size=1, p=p_cluster);
-        clusters.append(data[center]);
+        centers.append(data[center]);
         np.delete(data, center);
         
     # flatten the second dimension since it is a 1
-    clusters = np.squeeze(np.array(clusters), axis=1);
+    centers = np.squeeze(np.array(centers), axis=1);
             
-    return clusters;
+    return centers;
