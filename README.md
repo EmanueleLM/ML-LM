@@ -7,8 +7,9 @@ numpy, pandas and few other packages.
 
 ## Things implemented so far June 6th 2018:
 - pca (numerical, categorical with pandas is coming soon);
-- covariance shift tool.
+- covariance shift tool;
+- kmeans (with kmeans++ init).
 
 ## TODO:
-- split the project in at least 3 subfolders: models (ml models), models comparison, data pre processing;
-- finish pca
+- finishing kmeans-
+- testing kmeans and PCA on real world datasets

@@ -20,17 +20,23 @@ distances_dict = {'L2': dist.L2, 'L1': dist.L1, 'L0': dist.L0,
 
 import numpy as np
 
-# random initialization procedure
-def random(dims):
+# random initialization procedure.
+# returns the centers as datapoints.
+def random(data, k):
     
-    clusters = np.random.rand(*(dims));
+    clusters = np.random.choice(range(data.shape[0]), size=k, replace=False);
     
-    return clusters;
- 
-# kmeans++ initialization procedure
+    return data[clusters];
+
+# TODO: once a point becomes a cluster, it cannot be selected again
+# kmeans++ initialization procedure.
 def kmeans_plus_plus(data, k, distance):
     
-    clusters = list(data[np.random.choice(data.shape[0])]);
+    # select the firt point at random from data
+    clusters = list();
+    center = np.random.choice(range(data.shape[0]), size=1);
+    clusters.append(data[center]);
+    np.delete(data, center);
     
     for _ in range(k-1):
         
@@ -39,6 +45,11 @@ def kmeans_plus_plus(data, k, distance):
         p_cluster = p_cluster/np.sum(p_cluster, axis=0);
         
         # select new point of the cluster by picking from the pdf
-        clusters.append(np.random.choice(range(data.shape[0]), size=1, p=p_cluster));
+        center = np.random.choice(range(data.shape[0]), size=1, p=p_cluster);
+        clusters.append(data[center]);
+        np.delete(data, center);
+        
+    # flatten the second dimension since it is a 1
+    clusters = np.squeeze(np.array(clusters), axis=1);
             
     return clusters;
