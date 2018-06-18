@@ -13,8 +13,8 @@ import numpy as np
 # L2 or Euclidean norm between two points
 def L2(pt, pts):
     
-    res = np.power((pts-pt),2); # SIMD operations
-    res = np.sqrt(np.sum(res, axis=1));
+    res = np.power((pts-pt), 2); # SIMD operations
+    res = np.sqrt(res.sum(axis=tuple((i for i in range(1,pt.ndim+1)))));
     
     return res;
 
