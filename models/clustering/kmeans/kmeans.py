@@ -56,29 +56,24 @@ def kmeans(data, k=5, distance='L2', init='random', epsilon=1e-3, assignments=Fa
                       
             if pt_to_cluster_distance.shape != (0,):
                 
+                # stack the distances, from each center, vertically
                 pt_to_cluster_distance = np.vstack([pt_to_cluster_distance, d]);
                 
             else:
                 
                 pt_to_cluster_distance = d;
-                
-        print(pt_to_cluster_distance.shape)
-        
+                       
         # obtain distance from each nearest cluster and index of the cluster itself
         intra_cluster_distance = np.amin(pt_to_cluster_distance, axis=0);
         clusters_assignments = np.argmin(pt_to_cluster_distance, axis=0);
-               
-        print(data.shape, clusters_assignments.shape, intra_cluster_distance.shape)
-        
+                             
         # update the cluster's center
         for i in range(k):
             
             # a cluster may contain zero points assigned to it, in that case the
             #  cluster's center is unchanged
             if len(np.where(clusters_assignments==i)) > 0:
-                
-                print(np.where(clusters_assignments==i))
-            
+                           
                 # for each cluster, 'reduce' by index assignment to get new center
                 data_to_cluster_i = data[np.where(clusters_assignments==i)];
                             

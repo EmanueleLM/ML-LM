@@ -14,14 +14,14 @@ import numpy as np
 def L2(pt, pts):
     
     res = np.power((pts-pt), 2); # SIMD operations
-    res = np.sqrt(res.sum(axis=tuple((i for i in range(1,pt.ndim)))));
+    res = np.sqrt(res.sum(axis=tuple((i for i in range(1, pt.ndim+1)))));
     
     return res;
 
 # L1 norm    
 def L1(pt, pts):
        
-    res = np.sum(np.abs(pts-pt), axis=tuple((i for i in range(1,pt.ndim)))); # SIMD operations
+    res = np.sum(np.abs(pts-pt), axis=tuple((i for i in range(1, pt.ndim+1)))); # SIMD operations
     
     return res;
   
@@ -29,7 +29,7 @@ def L1(pt, pts):
 def L0(pt, pts):
     
     res = np.abs(pts-pt); # SIMD operations
-    res = np.min(res, axis=tuple((i for i in range(1,pt.ndim))));
+    res = np.min(res, axis=tuple((i for i in range(1, pt.ndim+1))));
     
     return res;
  
@@ -37,6 +37,6 @@ def L0(pt, pts):
 def LInf(pt, pts):
     
     res = np.abs(pts-pt); # SIMD operations
-    res = np.max(res, axis=tuple((i for i in range(1,pt.ndim))));
+    res = np.max(res, axis=tuple((i for i in range(1, pt.ndim+1))));
     
-    return res;
+    return res;s
