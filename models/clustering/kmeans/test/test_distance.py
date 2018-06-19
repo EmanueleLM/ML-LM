@@ -39,15 +39,21 @@ if __name__ == "__main__":
     # test dimensions
     
     x = np.random.rand(*(i for i in range(10, 30, 5)));
-    
+       
     # L2
     assert len(dist.L2(x, x[0])) == (x.shape[0]), "L2 test has failed: dimensions mismatch";
+    assert (dist.L2(x, x[0]).ndim) == 1, "L2 test has failed: dimensions mismatch";
     
     # L1
     assert len(dist.L1(x, x[0])) == (x.shape[0]), "L1 test has failed: dimensions mismatch";
+    assert (dist.L1(x, x[0]).ndim) == 1, "L1 test has failed: dimensions mismatch";
+
     
     # L0
     assert len(dist.L0(x, x[0])) == (x.shape[0]), "L0 test has failed: dimensions mismatch";
+    assert (dist.L0(x, x[0]).ndim) == 1, "L0 test has failed: dimensions mismatch";
     
     # LInf
     assert len(dist.LInf(x, x[0])) == (x.shape[0]), "LInf test has failed: dimensions mismatch";
+    assert (dist.LInf(x, x[0]).ndim) == 1, "LInf test has failed: dimensions mismatch";
+
