@@ -39,4 +39,4 @@ def LInf(pt, pts):
     res = np.abs(pts-pt); # SIMD operations
     res = np.max(res, axis=tuple((i for i in range(1, pt.ndim+1))));
     
-    return res;s
+    return res;

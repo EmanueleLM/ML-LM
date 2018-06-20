@@ -66,7 +66,7 @@ def kmeans(data, k=5, distance='L2', init='random', epsilon=1e-3, assignments=Fa
         # obtain distance from each nearest cluster and index of the cluster itself
         intra_cluster_distance = np.amin(pt_to_cluster_distance, axis=0);
         clusters_assignments = np.argmin(pt_to_cluster_distance, axis=0);
-                             
+                                     
         # update the cluster's center
         for i in range(k):
             

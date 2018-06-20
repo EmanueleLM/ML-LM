@@ -28,7 +28,6 @@ def random(data, k, distance=None):
     
     return data[centers];
 
-# TODO: once a point becomes a cluster, it cannot be selected again
 # kmeans++ initialization procedure.
 def kmeans_plus_plus(data, k, distance):
     
@@ -36,12 +35,11 @@ def kmeans_plus_plus(data, k, distance):
     centers = list();
     center = np.random.choice(range(data.shape[0]), size=1);
     centers.append(data[center]);
-    np.delete(data, center);
-    
+      
     for _ in range(k-1):
         
         # create pdf for each datapoint wrt the last element of the cluster
-        p_cluster = distances_dict[distance](centers[-1], data);
+        p_cluster = distances_dict[distance](centers[-1][0], data);
         p_cluster = p_cluster/np.sum(p_cluster, axis=0);
         
         # select new point of the cluster by picking from the pdf
