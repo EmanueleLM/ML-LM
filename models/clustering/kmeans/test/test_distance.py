@@ -19,7 +19,7 @@ import numpy as np
 if __name__ == "__main__":
     
     # test result
-    
+     
     # create a vector where each entry has increasing number of ones
     x = np.array([[(1 if i>=j else 0) for i in range(10)] for j in range(10)]);
     x = x.T;

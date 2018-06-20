@@ -28,10 +28,11 @@ if __name__ == "__main__":
     
     plt.plot(data[:,0], data[:,1], 'r*', 
              centers[:,0], centers[:,1], 'g^');
-             
+            
     # create centers of the clusters with kmeans++ initialization's method
     centers = cinit.kmeans_plus_plus(data, k=10, distance='L2');
     
     plt.plot(data[:,0], data[:,1], 'r*', 
-             centers[:,0], centers[:,1], 'bs');
+             centers[:,0], centers[:,1], 'ys');
+             
     

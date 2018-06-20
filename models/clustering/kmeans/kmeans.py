@@ -38,7 +38,7 @@ def kmeans(data, k=5, distance='L2', init='random', epsilon=1e-3, assignments=Fa
     # init a list of indices for each point in the dataset, for each cluster
     clusters_assignments = np.array([]);
     intra_cluster_distance = np.array(-epsilon);
-    
+       
     convergence = False;
     
     # initial intra-clusters distance
