@@ -22,10 +22,14 @@ def SDAR(X, discount=.1, k=10):
     mu_hat = np.zeros(shape=(X.shape[0])); 
     C_j_prec = np.zeros(shape=(X.shape[0], k)); # previous window
     C_j = np.zeros(shape=(X.shape[0], k));
-    
+       
     # parameters of the model
     A = np.zeros(shape=(X.shape[0], k));
     W = np.zeros(shape=(k,k));
+    
+    # solutions to the algorithm
+    x_hat = np.zeros(shape=(X.shape[0], n_sample-k));
+    sigma = np.zeros(shape=(n_sample-k));
     
     for i in range(k, n_sample):
             
@@ -49,6 +53,10 @@ def SDAR(X, discount=.1, k=10):
             A[j] = np.linalg.solve(W, Y);
             
         C_j_prec = cp.deepcopy(C_j);
+        
+        # predict the parameters for the next sample
+        x_hat[:,i] = np.sum(np.dot(A[j], X[:,i-k:i]-mu_hat), axis=1) + mu_hat;
+        sigma[i] = (1-discount)*sigma[max(0, i-1)] + discount*np.sum((X[:,i]-x_hat[:,i])**2);
         
         
 
