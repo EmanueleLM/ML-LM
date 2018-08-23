@@ -54,7 +54,7 @@ def SDEM(X, n_mixtures, alpha=1., discount=.1):
     # initialization (to zero) of the parameter 'mu_hat'
     mu_hat = np.zeros(shape=centers.shape);  
     
-    # initialize the covariance matrices (isotropic): this is the 'lambda' parameter
+    # initialize the covariance matrices: this is the 'lambda' parameter
     cov = np.zeros(shape=(n_mixtures, X.shape[0], X.shape[0]));
     
     # initialize 'lambda_hat' parameter of the paper

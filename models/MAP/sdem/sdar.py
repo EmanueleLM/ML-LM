@@ -14,6 +14,22 @@ Sequentially discounting Expectation Maximization algorithm, references
 import copy as cp
 import numpy as np
 
+# generalization of the one-dimensional (univariate) normal distribution to 
+#  higher dimensions
+def multivariate_gaussian(x, mean, cov):
+    
+     d = x.shape[0];
+     
+     # covariance matrices have positive (or null) determinant
+     det = np.linalg.det(cov);
+     inv = np.linalg.inv(cov);
+          
+     g_exp = (-1/2) * np.dot(np.dot((x-mean), inv), (x-mean));
+     
+     p_x = (np.exp(g_exp))/np.sqrt((2*np.pi)**d * det);
+     
+     return p_x;
+
 def SDAR(X, discount=.1, k=10):
     
     n_sample = X.shape[1];
@@ -29,11 +45,15 @@ def SDAR(X, discount=.1, k=10):
     
     # solutions to the algorithm
     x_hat = np.zeros(shape=(X.shape[0], n_sample-k));
-    sigma = np.zeros(shape=(n_sample-k));
+    means_gaussian = np.zeros(shape=(X.shape[0], n_sample-k));
+    sigma = np.zeros(shape=(X.shape[0], X.shape[0], n_sample-k));
     
     for i in range(k, n_sample):
             
         mu_hat = (1-discount)*mu_hat + discount*X[:,i];
+        
+        # assign the new mean of the gaussian
+        means_gaussian[:,i] = mu_hat;
         
         for j in range(k):
             
@@ -56,7 +76,10 @@ def SDAR(X, discount=.1, k=10):
         
         # predict the parameters for the next sample
         x_hat[:,i] = np.sum(np.dot(A[j], X[:,i-k:i]-mu_hat), axis=1) + mu_hat;
-        sigma[i] = (1-discount)*sigma[max(0, i-1)] + discount*np.sum((X[:,i]-x_hat[:,i])**2);
+        # assign the new covariance matrix of the gaussian
+        sigma[:,:,i] = (1-discount)*sigma[:,:,max(0, i-1)] + discount*np.sum((X[:,i]-x_hat[:,i])**2);
+        
+    return means_gaussian, sigma;
         
         
 
