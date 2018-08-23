@@ -18,17 +18,17 @@ import numpy as np
 #  higher dimensions
 def multivariate_gaussian(x, mean, cov):
     
-     d = x.shape[0];
+    d = x.shape[0];
      
-     # covariance matrices have positive (or null) determinant
-     det = np.linalg.det(cov);
-     inv = np.linalg.inv(cov);
+    # covariance matrices have positive (or null) determinant
+    det = np.linalg.det(cov);
+    inv = np.linalg.inv(cov);
           
-     g_exp = (-1/2) * np.dot(np.dot((x-mean), inv), (x-mean));
+    g_exp = (-1/2) * np.dot(np.dot((x-mean), inv), (x-mean));
      
-     p_x = (np.exp(g_exp))/np.sqrt((2*np.pi)**d * det);
+    p_x = (np.exp(g_exp))/np.sqrt((2*np.pi)**d * det);
      
-     return p_x;
+    return p_x;
 
 def SDAR(X, discount=.1, k=10):
     
@@ -59,8 +59,9 @@ def SDAR(X, discount=.1, k=10):
             
             C_j[:,j] = (1-discount)*C_j[:,j] + discount*np.dot(X[:,i]-mu_hat, (X[:,i-j]-mu_hat).T);
          
-        # stack the old and new windows horizontaly
-        window = np.hstack([C_j_prec, C_j]);
+        # stack the old and new windows horizontaly:
+        #  the last element in C_j_prec is the first of C_j
+        window = np.hstack([C_j_prec[:,:-1], C_j]);
             
         for j in range(X.shape[0]):
             
@@ -68,7 +69,7 @@ def SDAR(X, discount=.1, k=10):
             
             for wind in range(k):
                 
-                W[wind] = window[1+wind:1+wind+k]; 
+                W[wind] = window[j,1+wind:1+wind+k]; 
             
             A[j] = np.linalg.solve(W, Y);
             
