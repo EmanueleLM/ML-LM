@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Aug 23 11:36:04 2018
+Created on Wed Oct 31 09:35:31 2018
 
 @author: Gabriele
 
@@ -12,47 +12,60 @@ Sequentially discounting Expectation Maximization algorithm, references
   
 """
 
+# solve the relative import ussues
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../");
+
+import sdar as sdar_alg
+
+import copy as cp
+import matplotlib.pyplot as plt
 import numpy as np
-from scipy.stats import multivariate_normal
+import pandas as pd 
 
-# multivariate gaussian estimation
-def multivariate_gaussian(x, mean, cov):
+index = pd.read_csv('data/TOPIX_index.csv').values
+plt_index = cp.copy(index) # unnormalized and used for plot purpose
 
-    d = cov.shape[0];
+#initialize dataset and parameters for the sdar test
+index = (index-min(index))/(max(index)-min(index))
+index = index.T
+k = 4
+res = sdar_alg.sdar(index, 0.005, k);
+x_hat, sigma_hat = res[0], res[1]
+
+
+# estimate outliers
+sample_size = len(x_hat)
+score = list()
+score_plot = np.array([])
+
+for i in range(sample_size):
     
-    try: 
-        det = np.linalg.det(cov);
-        inv = np.linalg.inv(cov);
-        
-        g_exp = (-1/2) * np.dot(np.dot((x-mean).T, inv), (x-mean));
-             
-        p_x = np.exp(g_exp)/np.sqrt(((2*np.pi)**d) * det);
-        
-        return p_x[0,0];
-    
-    # covariance matrix has positive (or null) determinant
-    except np.linalg.LinAlgError:
-         
-        return 0.
-    
-# Scoring function, section 3. of the paper
-def outlier_detect_gauss(x, mu, gamma):
-    
-    res = multivariate_normal(mu.flatten(), gamma, allow_singular=True).pdf(x)
-    #res = multivariate_gaussian(x, mu, gamma)
-    res = -np.log2(res)
-    
-    return res  
-  
-# Change Point Detection, section 4. of the paper    
-def change_point_detect(X, T):
-    
-    scoring = list()
-       
-    for i in range (T, len(X)):
-        
-        scoring.append(np.sum(np.vstack(X[i-T:i])/T))
-            
-    return scoring
-    
-    
+    score.append(sdar_alg.outlier_detect_gauss(index[:,i+k], x_hat[i], sigma_hat[i]));
+
+# estimate change point
+T = 5
+change_point = sdar_alg.change_point_detect(score, T)   
+
+
+# plot series and change point on the same image
+fig, ax1 = plt.subplots()
+
+# data series
+ax1.plot(plt_index, 'b', label='TOPIX')
+ax1.set_xlabel('Date')
+ax1.set_ylabel('TOPIX')
+
+# change point
+ax2 = ax1.twinx()
+change_point = np.vstack(change_point)
+ax2.plot(change_point, 'r', label='change point')
+ax2.set_ylabel('Change Point')
+plt.legend(loc='best')
+
+fig.tight_layout()
+plt.show()
+
+# save graph
+#fig.savefig('graph.pdf')
