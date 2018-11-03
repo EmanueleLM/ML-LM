@@ -14,6 +14,7 @@ Sequentially discounting Expectation Maximization algorithm, references
 
 import numpy as np
 import copy as cp
+from scipy.stats import multivariate_normal
 
 # sdar algorithm
 def sdar(X, discount = 0.1, k = 10):
@@ -65,6 +66,46 @@ def sdar(X, discount = 0.1, k = 10):
         SIGMA_HAT.append(sigma_hat)
         
     return X_HAT, SIGMA_HAT
+
+# multivariate gaussian estimation
+def multivariate_gaussian(x, mean, cov):
+
+    d = cov.shape[0];
+    
+    try: 
+        det = np.linalg.det(cov);
+        inv = np.linalg.inv(cov);
+        
+        g_exp = (-1/2) * np.dot(np.dot((x-mean).T, inv), (x-mean));
+             
+        p_x = np.exp(g_exp)/np.sqrt(((2*np.pi)**d) * det);
+        
+        return p_x[0,0];
+    
+    # covariance matrix has positive (or null) determinant
+    except np.linalg.LinAlgError:
+         
+        return 0.
+    
+# Scoring function, section 3. of the paper
+def outlier_detect_gauss(x, mu, gamma):
+    
+    res = multivariate_normal(mu.flatten(), gamma, allow_singular=True).pdf(x)
+    #res = multivariate_gaussian(x, mu, gamma)
+    res = -np.log2(res)
+    
+    return res  
+  
+# Change Point Detection, section 4. of the paper    
+def change_point_detect(X, T):
+    
+    scoring = list()
+       
+    for i in range (T, len(X)):
+        
+        scoring.append(np.sum(np.vstack(X[i-T:i])/T))
+            
+    return scoring
         
 
 
