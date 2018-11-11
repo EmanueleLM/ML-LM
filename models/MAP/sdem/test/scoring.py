@@ -52,15 +52,17 @@ change_point = sdar_alg.change_point_detect(score, T)
 # plot series and change point on the same image
 fig, ax1 = plt.subplots()
 
-# data series
-ax1.plot(plt_index, 'b', label='TOPIX')
+# data series 
+# exclude the first few points since the prediction may be biased by the initialization
+ax1.plot(plt_index[10:], 'b', label='TOPIX')
 ax1.set_xlabel('Date')
 ax1.set_ylabel('TOPIX')
 
 # change point
+# exclude the first few points since the prediction may be biased by the initialization
 ax2 = ax1.twinx()
 change_point = np.vstack(change_point)
-ax2.plot(change_point, 'r', label='change point')
+ax2.plot(change_point[10:], 'r', label='change point')
 ax2.set_ylabel('Change Point')
 plt.legend(loc='best')
 
