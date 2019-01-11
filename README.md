@@ -9,7 +9,8 @@ numpy, pandas and few other basic packages.
 - SDAR, SDEM algorithms;
 - pca (numerical, categorical with pandas is coming soon);
 - covariance shift tool;
-- kmeans (with kmeans++ init).
+- kmeans (with kmeans++ init);
+- data split (train, test, validation).
 
 ## TODO:
 - finishing kmeans-
