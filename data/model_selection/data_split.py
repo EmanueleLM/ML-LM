@@ -5,6 +5,7 @@ Created on Sat Dec 15 09:52:07 2018
 @author: Emanuele
 """
 
+import numpy as np
 import pandas as pd
 import sklearn.utils as skutils
 
@@ -26,15 +27,32 @@ import sklearn.utils as skutils
     validation_percentage:float, number between 0 and 1 (included) that specifies the size of
                            the dataset reserved to validation purpose. It is ignored if 'split' is 
                            set to 'train-test' (i.e. no validation is performed);
+    normalize:boolean, if True, normalize data with min-max method (i.e. subtract minimum and
+               divide by (max-min));
+    time-difference:boolean, if True, each datapoint is subtracted with the previous one to
+                     compose the next input (i.e. data(t) = data(t)-data(t-1)). This means
+                     the dataset dimension is diminished by one.
 """
-def data_split(filename, 
+def data_split(filename,
                split='train', 
                train_percentage=.7, 
                validation_percentage=.1,
-               shuffle=False):
+               shuffle=False,
+               normalize=False,
+               time_difference=False):
     
     data = pd.read_csv(filename, delimiter=',', header=0)
     data = (data.iloc[:,:]).values
+
+    if normalize is True:
+        
+        data = (data-np.min(data))/(np.max(data)-np.min(data))
+    
+    # if the flag is enabled, turn the dataset into the variation of each time 
+    #  step with the previous value (loose the firt sample)
+    if time_difference is True:
+        
+        data = data[:-1] - data[1:]
     
     if shuffle is True:
         
