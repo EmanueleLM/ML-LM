@@ -30,7 +30,7 @@ import sklearn.utils as skutils
     normalize:boolean, if True, normalize data with min-max method (i.e. subtract minimum and
                divide by (max-min));
     time-difference:boolean, if True, each datapoint is subtracted with the previous one to
-                     compose the next input (i.e. data(t) = data(t)-data(t-1)). This means
+                     compose the next input (i.e. new_data(t) = data(t)-data(t-1)). This means
                      the dataset dimension is diminished by one.
 """
 def data_split(filename,
@@ -52,7 +52,7 @@ def data_split(filename,
     #  step with the previous value (loose the firt sample)
     if time_difference is True:
         
-        data = data[:-1] - data[1:]
+        data = data[1:] - data[:-1]
     
     if shuffle is True:
         
